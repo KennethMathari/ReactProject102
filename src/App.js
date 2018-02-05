@@ -1,62 +1,64 @@
+
 import React, { Component } from 'react';
+import { createStore } from 'redux';
+import userApp from './redux/reducers'
 
-class App extends Component{
-  constructor()
-  {
-    super();
-    this.state={
-      data:[],/*[
-        {
-          id:1,
-          name:'kenneth'
+let store = createStore(userApp)
+
+
+
+
+
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      isLoaded: false,
+      user: []
+    };
+  }
+
+  componentDidMount() {
+    fetch("https://dry‑harbor‑88607.herokuapp.com/api/users")
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            isLoaded: true,
+            user: result.user
+          });
         },
-        {
-          id:2,
-          name:'Mathari'
-        },
-        {
-          id:3,
-          name:'Ndungu'
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          this.setState({
+            isLoaded: true,
+            error
+          });
         }
-      ]*/
+      )
+  }
+
+  render() {
+    const { error, isLoaded, items } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return (
+        <ul>
+          {items.map(user => (
+            <li key={user.name}>
+              {user.name}
+            </li>
+          ))}
+        </ul>
+      );
     }
-  }
-
-  componentDidMount(){
-    fetch('https://dry‑harbor‑88607.herokuapp.com/api/users').
-    then((Response)=>Response.json()).
-    then((findresponse)=>
-    {
-       console.log(findresponse.user)
-       this.setState({
-         data:findresponse.user,
-
-       })
-    })
-  }
-
-
-
-  render()
-  {
-    return(
-      <div>
-        {
-          this.state.data.map((dynamicData,key)=>
-          <div>
-            <h3>Name</h3>
-            <ul>
-              <li>{dynamicData.name}</li>
-              <li>{dynamicData.email}</li>
-              <li>{dynamicData.password}</li>
-              <li>{dynamicData.mobile_number}</li>
-            </ul>
-            </div>
-         
-        )
-        }
-      </div>
-    )
   }
 }
 
